@@ -1,0 +1,417 @@
+/* frontend/src/assets/globals.css
+ *
+ * Fotographiya Blog — global stylesheet.
+ * Dark cinematic theme per DESIGN.md.
+ * Pure Black (#000000) background, Pure White (#ffffff) primary text.
+ * Single font family: Syne (all weights 400–800).
+ *
+ * footer.css merged at the bottom of this file — no separate CSS file.
+ */
+
+/* Syne — single brand typeface (DESIGN.md §2)                          */
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------------------------------- */
+/* Fonts                                                                  */
+/* -------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------- */
+/* Design tokens (CSS custom properties)                                 */
+/* Mirrors tailwind.config.js theme.extend exactly.                      */
+/* -------------------------------------------------------------------- */
+:root {
+  /* DESIGN.md primary tokens */
+  --site-base:    #000000;
+  --site-surface: #111111;
+  --site-text:    #ffffff;
+  --site-muted:   #777777;
+  --site-border:  #333333;
+
+  /* Legacy B&W tokens — remapped to dark theme values */
+  --surface-dark:          #000000;
+  --surface-dark-elevated: #111111;
+  --surface-light:         #ffffff;  /* inverted/white elements */
+  --surface-mid:           #333333;  /* borders & dividers */
+  --ink-primary:           #ffffff;  /* primary text (white on dark) */
+  --ink-inverse:           #000000;  /* text on white elements */
+  --ink-muted:             #777777;  /* secondary text */
+
+  /* Typography */
+  --font-sans:    'Syne', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  /* UI uses Inter, content/display uses Syne */
+  --font-sans:    'Inter', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Radius */
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-pill: 9999px;
+
+  /* Motion */
+  --duration-instant: 200ms;
+  --duration-fast:    250ms;
+  --duration-normal:  350ms;
+  --duration-slow:    700ms;
+
+  /* z-index */
+  --z-drawer:  1001;
+  --z-overlay: 999;
+  --z-toast:   1100;
+
+  /* Layout */
+  --max-w-reading: 760px;
+}
+
+/* -------------------------------------------------------------------- */
+/* Base / reset                                                          */
+/* -------------------------------------------------------------------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Dark theme: enforce black base on html */
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  body {
+    /* DESIGN.md: surface.base = #000000, text.primary = #ffffff */
+    @apply bg-surface-dark text-ink-primary font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  picture,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Focus ring — white ring on dark backgrounds (inverted from old B&W system) */
+  :focus-visible {
+    outline: 2px solid var(--ink-primary);  /* = white */
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* On white/light surfaces (modals, white buttons) invert the ring to black */
+  .bg-surface-light :focus-visible,
+  .bg-white :focus-visible {
+    outline-color: var(--ink-inverse);  /* = black */
+  }
+
+  ::selection {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  /* Respect reduced-motion (required by the footer marquee) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Component-level primitives                                            */
+/* -------------------------------------------------------------------- */
+@layer components {
+  /* Reading column for single-post article bodies */
+  .prose-reading {
+    max-width: var(--max-w-reading);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* TipTap-rendered article HTML — dark theme typography */
+  .prose-article h2 {
+    @apply font-display mt-10 mb-4 text-3xl font-bold leading-snug text-ink-primary;
+  }
+
+  .prose-article h3 {
+    @apply font-display mt-8 mb-3 text-2xl font-semibold leading-snug text-ink-primary;
+  }
+
+  .prose-article p {
+    @apply mb-5 text-ink-primary leading-relaxed;
+  }
+
+  .prose-article a {
+    @apply underline underline-offset-2 text-ink-primary;
+  }
+
+  .prose-article ul,
+  .prose-article ol {
+    @apply mb-5 ml-6 text-ink-primary;
+  }
+
+  .prose-article ul {
+    @apply list-disc;
+  }
+
+  .prose-article ol {
+    @apply list-decimal;
+  }
+
+  .prose-article blockquote {
+    @apply border-l-2 border-surface-mid pl-4 italic text-ink-muted my-6;
+  }
+
+  .prose-article img,
+  .prose-article video {
+    @apply my-8 w-full;
+  }
+
+  .prose-article code {
+    @apply rounded-sm bg-[#1a1a1a] px-1.5 py-0.5 font-mono text-sm text-ink-primary;
+  }
+
+  .prose-article pre {
+    @apply overflow-x-auto rounded-sm bg-[#111111] p-4 text-ink-primary border border-surface-mid;
+  }
+
+  /* Animated title underline for post card links */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size var(--duration-normal) ease-out;
+  }
+
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Custom line-clamp utility to ensure text doesn't overflow */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Keyframes                                                              */
+/* -------------------------------------------------------------------- */
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ====================================================================== */
+/* MERGED footer.css — originally a standalone file, merged here per      */
+/* the project rule: no separate footer.css. All original selectors and   */
+/* values are preserved exactly; only the file location changes.          */
+/* ====================================================================== */
+
+.footer {
+  background: #000;
+  color: #fff;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+/* ===== TOP SECTION ===== */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4rem 3rem;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  max-width: 30%;
+  margin-top: 25px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 6rem;
+}
+
+.footer-col p {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #777;
+  margin-bottom: 0.8rem;
+}
+
+.footer-col a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 2;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  transition: color var(--duration-fast, 250ms) ease;
+}
+
+.footer-col a:hover {
+  color: #777;
+}
+
+.footer-col a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ===== MARQUEE ===== */
+.footer-marquee {
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  will-change: transform;
+}
+
+.marquee-track span {
+  font-family: 'Syne', sans-serif;
+  font-size: 8vw;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  padding: 2rem 1rem;
+}
+
+.dot {
+  width: 1.5vw;
+  height: 1.5vw;
+  background: #fff;
+  border-radius: 50%;
+  margin: 0 2vw;
+  flex-shrink: 0;
+}
+
+/* ===== BOTTOM ===== */
+.footer-bottom {
+  display: flex;
+  justify-content: flex-end;
+  padding: 2.5rem 4rem 0;
+}
+
+.back-to-top {
+  background: none;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+}
+
+.back-to-top:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+.arrow {
+  border: 2px solid white;
+  border-radius: 50%;
+  padding: 0.8rem 1rem;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top:hover .arrow {
+  transform: translateY(-4px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .footer-top {
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .footer-links {
+    gap: 3rem;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .footer-bottom {
+    justify-content: center;
+  }
+
+  .marquee-track span {
+    font-size: 14vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding-top: 2rem;
+  }
+
+  .footer-top {
+    padding: 0 1.5rem 2rem;
+  }
+
+  .footer-logo {
+    font-size: 1.6rem;
+  }
+
+  .footer-bottom {
+    padding: 2rem 1.5rem 0;
+  }
+
+  .marquee-track span {
+    font-size: 18vw;
+  }
+}

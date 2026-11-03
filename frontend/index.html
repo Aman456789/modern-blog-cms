@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" href="data:," />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+
+    <!-- Primary meta handled dynamically by react-helmet-async -->
+    <meta name="theme-color" content="#000000" />
+
+    <!--
+      FIX Bug 7: Previous version loaded Cormorant Garamond + Lato which are
+      NOT in the design system. DESIGN.md §2 specifies Syne (400–800) as the
+      sole brand typeface. globals.css @import also loads Syne; the <link>
+      here fires earlier so the font is available before React hydrates and
+      prevents layout shift on the public feed hero.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- UI font: Inter (variable) + Content font: Syne -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap" />
+
+    <!-- Open Graph and Twitter tags handled dynamically by react-helmet-async -->
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
