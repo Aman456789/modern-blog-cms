@@ -56,12 +56,19 @@ const s3Cron = new S3Client({
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-// credentials: true is required for the HttpOnly JWT cookie to be sent
-// cross-origin during local Vite dev (port 5173 → 5000).
-app.use(cors({
-  origin:      CLIENT_URL,
+// Enable CORS completely to prevent any browser blocking while supporting credentials
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow any origin dynamically (including null/undefined for curl/same-origin)
+    callback(null, true);
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
 
 // ── Body parsers ──────────────────────────────────────────────────────────────
 // Security Middleware Shield
