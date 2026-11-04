@@ -38,7 +38,7 @@ const __dirname  = path.dirname(__filename);
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const PORT       = Number(process.env.PORT) || 5000;
+const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // ── S3 Client (for cron auto-cleaner) ────────────────────────────────────────
@@ -56,19 +56,8 @@ const s3Cron = new S3Client({
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-// Enable CORS completely to prevent any browser blocking while supporting credentials
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow any origin dynamically (including null/undefined for curl/same-origin)
-    callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+app.use(cors({ origin: '*' }));
+app.options('*', cors());
 
 // ── Body parsers ──────────────────────────────────────────────────────────────
 // Security Middleware Shield
