@@ -97,10 +97,38 @@ app.use(cookieParser());
 // Files are now stored on AWS S3 — no local /uploads static route needed.
 // (Removed: express.static(UPLOAD_DIR) block)
 
+// ── Health Check & Root Status ────────────────────────────────────────────────
+// Satisfies AWS Elastic Beanstalk ALB health checks and provides root status
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    message: 'Fotographiya API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    message: 'Fotographiya API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 // Public auth endpoints (login, logout, /me)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+app.use('/api/api/auth', authRoutes);
 
 // Public read-only blog API (posts, categories, tags)
 app.use('/api', publicRoutes);

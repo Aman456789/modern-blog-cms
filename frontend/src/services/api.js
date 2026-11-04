@@ -8,9 +8,9 @@
 import axios from "axios";
 
 // Base URL pointing to the live AWS Elastic Beanstalk backend.
-// Strips any accidental trailing slashes so paths like /api/* append cleanly.
+// Strips any accidental trailing slashes and redundant /api suffixes so paths like /api/* append cleanly.
 const rawBaseURL = import.meta.env.VITE_API_URL || "http://Aman-backend-env-1.eba-ufwvg2cy.ap-southeast-2.elasticbeanstalk.com";
-const baseURL = rawBaseURL.replace(/\/+$/, "");
+const baseURL = rawBaseURL.replace(/\/+$/, "").replace(/\/api$/, "");
 
 const api = axios.create({
   baseURL,
