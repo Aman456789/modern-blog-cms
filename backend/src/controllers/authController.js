@@ -7,7 +7,7 @@
 //
 // Session strategy (TRD 5.2): bcrypt.compare against a hash created
 // with cost factor 12, a 24-hour (86400s) JWT, issued inside a cookie
-// with httpOnly/secure/sameSite:'strict'.
+// with httpOnly/secure: true/sameSite:'none'.
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -20,14 +20,6 @@ const JWT_EXPIRES_IN_SECONDS = 86400; // 24 hours
 if (!JWT_SECRET) {
   throw new Error('Missing process.env.JWT_SECRET');
 }
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: false,
-  sameSite: 'strict',
-  maxAge: JWT_EXPIRES_IN_SECONDS * 1000,
-  path: '/',
-};
 
 /**
  * POST /api/auth/login
@@ -67,7 +59,12 @@ export async function login(req, res, next) {
       expiresIn: JWT_EXPIRES_IN_SECONDS,
     });
 
-    res.cookie(COOKIE_NAME, token, cookieOptions);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true, // Required for cross-site cookies
+      sameSite: 'none', // Allows cookie to be sent between Amplify and CloudFront
+      maxAge: 24 * 60 * 60 * 1000 // 1 day (or whatever your existing expiry is)
+    });
 
     return res.status(200).json({
       token,
@@ -90,10 +87,10 @@ export async function login(req, res, next) {
  */
 export async function logout(req, res, next) {
   try {
-    res.clearCookie(COOKIE_NAME, {
+    res.clearCookie('token', {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       path: '/',
     });
 
