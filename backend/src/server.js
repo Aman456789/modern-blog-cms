@@ -56,8 +56,14 @@ const s3Cron = new S3Client({
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-app.use(cors({ origin: '*' }));
-app.options('*', cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "https://main.d1ssqxz6taqm7m.amplifyapp.com",
+    credentials: true
+}));
+app.options('*', cors({
+    origin: process.env.FRONTEND_URL || "https://main.d1ssqxz6taqm7m.amplifyapp.com",
+    credentials: true
+}));
 
 // ── Body parsers ──────────────────────────────────────────────────────────────
 // Security Middleware Shield
